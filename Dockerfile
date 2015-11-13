@@ -6,8 +6,8 @@ EXPOSE 8123
 
 RUN mkdir -p /etc/polipo \
     && mkdir /cache
-ADD assets/polipo /usr/bin/polipo
-ADD assets/config /etc/polipo/config
+ADD ./assets/polipo /usr/bin/polipo
+ADD ./assets/config /etc/polipo/config
 
 # Expose the cache directory
 VOLUME ["/cache"]

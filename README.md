@@ -17,3 +17,15 @@ You can also access the polipo web interface to configure/monitor the running in
 ```
 http://<docker ip>:8123/polipo/
 ```
+### Using with Vagrant
+If you wish to have Vagrant automatically add the proxy to any started VMs if the polipo container is running
+
+Install the `vagrant-proxyconf` plugin:
+
+    vagrant plugin install vagrant-proxyconf
+
+Add the `Vagrantfile` from the vagrant directory in this repo to `~/.vagrant.d`, this will automatically detect the docker-machines ip and check that Polipo is running before attempting to have Vagrant use the proxy.
+
+If a valid proxy is detected you will see the following on vagrant up:
+
+    Using Polipo Proxy: http://192.168.99.100:8123 

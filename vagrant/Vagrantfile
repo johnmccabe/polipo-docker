@@ -1,0 +1,37 @@
+require 'socket'
+require 'timeout'
+require "resolv"
+
+def is_port_open?(ip, port)
+  begin
+    Timeout::timeout(1) do
+      begin
+        s = TCPSocket.new(ip, port)
+        s.close
+        return true
+      rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+        return false
+      end
+    end
+  rescue Timeout::Error
+  end
+
+  return false
+end
+
+docker_machine_ip = %x{docker-machine ip default 2> /dev/null}.chop
+polipo_port = 8123
+if !!(docker_machine_ip  =~ Resolv::IPv4::Regex)
+  if is_port_open?(docker_machine_ip, polipo_port)
+    polipo_proxy_url ="http://%s:%s" % [docker_machine_ip, polipo_port]
+    puts "Using Polipo Proxy: %s" % [polipo_proxy_url]
+    Vagrant.configure("2") do |config|
+      if Vagrant.has_plugin?("vagrant-proxyconf")
+        config.proxy.http     = "#{polipo_proxy_url}"
+        config.proxy.https    = "#{polipo_proxy_url}"
+        config.proxy.enabled = { svn: false, docker: false }
+        config.proxy.no_proxy = "localhost,127.0.0.1"
+      end
+    end
+  end
+end
